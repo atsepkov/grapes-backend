@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link href="https://unpkg.com/grapesjs/dist/css/grapes.min.css" rel="stylesheet">
+  <script src="https://unpkg.com/grapesjs"></script>
+</head>
+<body>
+  <div id="gjs"></div>
+  <script>
+    const editor = grapesjs.init({
+      container: '#gjs',
+      storageManager: {
+        type: 'remote',
+        urlStore: 'http://localhost:3000/api/save',
+        urlLoad: 'http://localhost:3000/api/load/',
+      },
+    });
+  </script>
+</body>
+</html>
