@@ -28,42 +28,43 @@ const servePage = (id: string) => {
 
 // Bun server
 Bun.serve({
-  port: 3000,
-  async fetch(req) {
-    const url = new URL(req.url);
+    hostname: "0.0.0.0",
+    port: 3000,
+    async fetch(req) {
+        const url = new URL(req.url);
 
-    // Public landing pages
-    if (url.pathname.startsWith("/page/")) {
-      const id = url.pathname.split("/").pop();
-      return servePage(id);
-    }
-
-    // Editor API (localhost-only)
-    if (url.pathname.startsWith("/api/")) {
-      // Block remote access to API
-      const isLocal = req.headers.get("host")?.startsWith("localhost");
-      if (!isLocal) return new Response("Forbidden", { status: 403 });
-
-      // Save endpoint
-      if (url.pathname === "/api/save" && req.method === "POST") {
-        const { html, css, components } = await req.json();
-        const id = crypto.randomUUID();
-        db.query(`
-          INSERT INTO pages (id, html, css, components)
-          VALUES ($id, $html, $css, $components)
-        `).run({ $id: id, $html: html, $css: css, $components: components });
-        return new Response(JSON.stringify({ id }));
-      }
-
-      // Load endpoint
-      if (url.pathname.startsWith("/api/load/") && req.method === "GET") {
+        // Public landing pages
+        if (url.pathname.startsWith("/page/")) {
         const id = url.pathname.split("/").pop();
-        const page = db.query(`SELECT * FROM pages WHERE id = $id`).get({ $id: id });
-        return new Response(JSON.stringify(page || {}));
-      }
-    }
+        return servePage(id);
+        }
 
-    // Serve editor UI (public)
-    return new Response(Bun.file("index.html"));
-  },
+        // Editor API (localhost-only)
+        if (url.pathname.startsWith("/api/")) {
+        // Block remote access to API
+        const isLocal = req.headers.get("host")?.startsWith("localhost");
+        if (!isLocal) return new Response("Forbidden", { status: 403 });
+
+        // Save endpoint
+        if (url.pathname === "/api/save" && req.method === "POST") {
+            const { html, css, components } = await req.json();
+            const id = crypto.randomUUID();
+            db.query(`
+            INSERT INTO pages (id, html, css, components)
+            VALUES ($id, $html, $css, $components)
+            `).run({ $id: id, $html: html, $css: css, $components: components });
+            return new Response(JSON.stringify({ id }));
+        }
+
+        // Load endpoint
+        if (url.pathname.startsWith("/api/load/") && req.method === "GET") {
+            const id = url.pathname.split("/").pop();
+            const page = db.query(`SELECT * FROM pages WHERE id = $id`).get({ $id: id });
+            return new Response(JSON.stringify(page || {}));
+        }
+        }
+
+        // Serve editor UI (public)
+        return new Response(Bun.file("index.html"));
+    },
 });
