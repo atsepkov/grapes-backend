@@ -27,9 +27,9 @@ const servePage = (id: string) => {
 };
 
 // Bun server
-Bun.serve({
+const server = Bun.serve({
     hostname: "0.0.0.0",
-    port: 3000,
+    port: 8081,
     async fetch(req) {
         const url = new URL(req.url);
 
@@ -68,3 +68,5 @@ Bun.serve({
         return new Response(Bun.file("index.html"));
     },
 });
+
+console.log(`Server running at ${server.url}`);
