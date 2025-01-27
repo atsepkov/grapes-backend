@@ -1,6 +1,10 @@
 {
   "name": "grapes-backend",
   "module": "server.ts",
+  "scripts": {
+    "start": "bun run server.ts",
+    "dev": "bun run --hot server.ts"
+  },
   "type": "module",
   "devDependencies": {
     "@types/bun": "latest"
